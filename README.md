@@ -120,9 +120,10 @@ fly auth signup      # or: fly auth login
 
 ### 2. Create the app
 
-`fly.toml` is already configured for Sydney (`syd`) with a single always-on
-machine — rooms are held in memory, so the app must not auto-stop or scale to
-multiple instances.
+`fly.toml` is already configured for Ashburn, Virginia (`iad`) with a single
+always-on machine — rooms are held in memory, so the app must not auto-stop or
+scale to multiple instances. Change `primary_region` to move it; Fly's IPs are
+anycast, so no DNS or certificate work is needed.
 
 ```bash
 fly apps create reverie-walter     # or pick your own name and edit fly.toml
