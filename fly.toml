@@ -12,7 +12,10 @@
 # Check with `fly status` after any deploy: there must be exactly one machine.
 
 app = "reverie-walter"
-primary_region = "syd"   # Sydney — closest to walter.com.au
+# Ashburn, Virginia. Change to any Fly region and redeploy — the app is
+# stateless between games, and Fly's IPs are anycast, so no DNS change is
+# needed. Other North American options: ord, dfw, lax, sjc, ewr, yyz.
+primary_region = "iad"
 
 [build]
 
