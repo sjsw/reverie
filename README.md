@@ -24,8 +24,19 @@ better, and it comes with Marie Cardouat's illustrations.
 - **Client** — dependency-free ES modules, no build step
 - **Deck** — 300 public-domain artworks fetched from museum open-access APIs
 
+## Why this exists
+
+Reverie was built to replace **pixit.fun**, an earlier browser-based Dixit
+clone that is no longer online. It was the easiest way to get a group playing
+Dixit remotely, and there was nothing quite like it once it went away.
+
+This is a substitute rather than a copy — none of pixit.fun's code or artwork
+is used here, and no connection to its authors is claimed or implied. If you
+landed here looking for pixit.fun, this is meant to fill the same gap. Thanks
+to whoever built it.
+
 The sections below are for running your own instance. To just play, use the
-link above.
+link at the top.
 
 ---
 
