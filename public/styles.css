@@ -287,16 +287,6 @@ input[type="text"]:focus {
   color: var(--muted);
 }
 
-.rules-tip {
-  margin: 0.9rem 0 0;
-  padding: 0.7rem 0.9rem;
-  border-radius: 10px;
-  background: rgba(240, 180, 41, 0.1);
-  border: 1px solid rgba(240, 180, 41, 0.28);
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
 .rules-note {
   margin: 0.7rem 0 0.2rem;
   font-size: 0.85rem;

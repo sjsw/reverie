@@ -1,8 +1,14 @@
 # Reverie
 
+### ▶ Play now at **[reverie.walter.com.au](https://reverie.walter.com.au)**
+
+No install, no account — start a game and share the four-letter room code.
+
+---
+
 An open-source clone of **[Dixit](https://www.libellud.com/dixit/)**, the
 storytelling card game by Jean-Louis Roubira and Libellud — self-hosted, for
-3–15 players, in the browser with no install.
+3–15 players, in the browser.
 
 One player is the storyteller: they pick a picture from their hand and give a
 clue. Everyone else secretly plays a card that could also fit, then votes on
@@ -17,6 +23,9 @@ better, and it comes with Marie Cardouat's illustrations.
 - **Server** — Node + Express + `ws`, all state in memory
 - **Client** — dependency-free ES modules, no build step
 - **Deck** — 300 public-domain artworks fetched from museum open-access APIs
+
+The sections below are for running your own instance. To just play, use the
+link above.
 
 ---
 
