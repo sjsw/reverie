@@ -1,0 +1,46 @@
+# Fly.io deployment for Reverie.
+#
+# Rooms live in memory, so this app MUST run as exactly one always-on machine.
+# Two machines means two independent sets of rooms behind one hostname, and
+# players sharing a code land on different ones — the game silently breaks.
+#
+# `fly deploy` adds a second machine for high availability unless you stop it:
+#
+#     fly deploy --ha=false      # first deploy
+#     fly scale count 1          # fix an existing app that already has two
+#
+# Check with `fly status` after any deploy: there must be exactly one machine.
+
+app = "reverie-walter"
+primary_region = "syd"   # Sydney — closest to walter.com.au
+
+[build]
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Never park the machine: suspending it would wipe every active room.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "connections"
+    soft_limit = 200
+    hard_limit = 250
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "5s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/healthz"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+  cpus = 1

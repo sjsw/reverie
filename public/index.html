@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Reverie — a storytelling card game</title>
+    <meta name="description" content="A self-hosted storytelling card game for 3–15 players. Give a clue, find the picture." />
+    <meta name="theme-color" content="#160f22" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎴</text></svg>" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- ------------------------------------------------ landing -->
+      <section class="screen" id="screen-home">
+        <div class="home">
+          <h1 class="brand">Reverie</h1>
+          <p class="tagline">
+            Give a clue. Find the picture. Be mysterious — but not <em>too</em> mysterious.
+          </p>
+
+          <!-- Shown when someone arrives via an invite link (/ABCD). Joining
+               that specific room is the only thing they are here to do, so it
+               is the only prominent control. -->
+          <div class="card-panel panel-invite" id="panel-invite" hidden>
+            <div class="invite-eyebrow">You've been invited to join</div>
+            <div class="big-code" id="invite-code"></div>
+            <div class="invite-status" id="invite-status"></div>
+
+            <form id="invite-form">
+              <label class="field">
+                <span>Your name</span>
+                <input id="invite-name" type="text" maxlength="20" placeholder="e.g. Simon" autocomplete="nickname" />
+              </label>
+              <button class="btn btn-primary btn-block" id="btn-join-invite" type="submit">Join game</button>
+            </form>
+
+            <button class="btn-link" id="btn-start-instead" type="button">
+              or start a new game instead
+            </button>
+          </div>
+
+          <div class="card-panel" id="panel-default">
+            <label class="field">
+              <span>Your name</span>
+              <input id="name-input" type="text" maxlength="20" placeholder="e.g. Simon" autocomplete="nickname" />
+            </label>
+
+            <div class="home-actions">
+              <button class="btn btn-primary btn-block" id="btn-create">Start a new game</button>
+              <div class="or">or join one</div>
+              <form class="join-row" id="join-form">
+                <input id="code-input" type="text" maxlength="4" placeholder="CODE"
+                       autocomplete="off" autocapitalize="characters" spellcheck="false" />
+                <button class="btn" type="submit">Join</button>
+              </form>
+            </div>
+          </div>
+
+          <details class="rules">
+            <summary>How to play</summary>
+            <p class="rules-intro">3 to 15 players. Everyone holds six picture cards.</p>
+            <ol>
+              <li>Each round one player is the <strong>storyteller</strong>. They pick a card from their hand and give a clue for it — a word, a phrase, a sound, a song lyric, anything.</li>
+              <li>Everyone else secretly plays a card of their own that could <em>also</em> fit that clue, hoping to be mistaken for the original.</li>
+              <li>The cards are shuffled and laid face up. Everyone except the storyteller votes for the one they think was the storyteller's. You can't vote for your own.</li>
+              <li>
+                <strong>Scoring</strong>
+                <ul>
+                  <li>Everyone found it, or nobody did → storyteller scores <strong>0</strong>, everyone else scores <strong>2</strong>.</li>
+                  <li>Otherwise → the storyteller and each correct guesser score <strong>3</strong>.</li>
+                  <li>Either way, you score <strong>1</strong> for every vote your own card attracted.</li>
+                </ul>
+              </li>
+              <li>The storyteller passes to the next player, hands are topped back up to six, and it all happens again.</li>
+              <li>First to <strong>30 points</strong> wins.</li>
+            </ol>
+            <p class="rules-tip">
+              <strong>The whole game is in that scoring.</strong> Too obvious and everyone
+              guesses right — you score nothing. Too cryptic and nobody does — you
+              score nothing. Aim for a clue that <em>some</em> will get.
+            </p>
+            <p class="rules-note">
+              With exactly 3 players, everyone except the storyteller plays
+              <em>two</em> cards, so there are enough decoys to vote between.
+            </p>
+          </details>
+
+          <p class="credit-line">
+            Reverie is an independent, open-source clone of
+            <a href="https://www.libellud.com/dixit/" target="_blank" rel="noopener">Dixit</a>,
+            the storytelling card game by Jean-Louis Roubira and Libellud.
+            It is not affiliated with or endorsed by them — if you enjoy this,
+            buy the real thing.
+          </p>
+          <p class="credit-line">
+            Card art is public-domain work from the
+            <a href="https://www.artic.edu/" target="_blank" rel="noopener">Art Institute of Chicago</a>
+            and <a href="https://www.metmuseum.org/" target="_blank" rel="noopener">The Met</a>.
+            <a href="#" id="link-credits">See the deck</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------ game -->
+      <section class="screen" id="screen-game" hidden>
+        <header class="topbar">
+          <div class="topbar-left">
+            <span class="room-code" id="room-code" title="Click to copy the invite link"></span>
+            <span class="round-label" id="round-label"></span>
+          </div>
+          <div class="topbar-right">
+            <span class="deck-count" id="deck-count"></span>
+            <button class="btn btn-ghost btn-sm" id="btn-leave">Leave</button>
+          </div>
+        </header>
+
+        <div class="layout">
+          <aside class="sidebar">
+            <h2 class="sidebar-title">Players</h2>
+            <ul class="players" id="players"></ul>
+            <div class="log" id="log"></div>
+          </aside>
+
+          <main class="main" id="main"></main>
+        </div>
+      </section>
+
+      <!-- ------------------------------------------------ credits -->
+      <section class="screen" id="screen-credits" hidden>
+        <div class="credits">
+          <button class="btn btn-ghost btn-sm" id="btn-credits-back">← Back</button>
+          <h2>The deck</h2>
+          <p id="credits-summary" class="muted"></p>
+          <div class="credits-grid" id="credits-grid"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast-stack" id="toasts" aria-live="polite"></div>
+
+    <!-- Full-bleed card viewer -->
+    <div class="lightbox" id="lightbox" hidden>
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close">×</button>
+      <figure>
+        <img id="lightbox-img" alt="" />
+        <figcaption id="lightbox-caption"></figcaption>
+      </figure>
+    </div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

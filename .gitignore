@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.claude/settings.local.json
+
+# Card images are NOT committed (~90 MB). They are fully reproducible:
+# public/cards/manifest.json IS committed and records the exact 300 reviewed
+# works plus their source URLs, so `npm run restore-deck` rebuilds the same
+# hand-reviewed deck. Do not use `fetch-cards` for this — it searches afresh
+# and produces a different, unreviewed selection.
+public/cards/*.jpg
+!public/cards/manifest.json

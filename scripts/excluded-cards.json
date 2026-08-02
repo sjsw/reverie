@@ -1,0 +1,25 @@
+{
+  "note": "Cards removed during manual visual review as unsuitable for workplace use. The fetcher never re-downloads these.",
+  "excluded": [
+    "aic-105494",
+    "aic-19602",
+    "aic-23650",
+    "aic-79266",
+    "aic-79470",
+    "aic-8099",
+    "aic-84510",
+    "aic-97439",
+    "aic-90808"
+  ],
+  "reasons": {
+    "aic-105494": "Dore - Suicide of Gerard de Nerval (spectral nude figure + suicide subject)",
+    "aic-19602": "Charles Eisen - Cupids at War (wrong artist via regex; nude putti)",
+    "aic-23650": "Hokusai - Fujieda station (bare laborers, exposed buttocks)",
+    "aic-79266": "Redon - Cain and Abel (two nude male figures)",
+    "aic-79470": "Redon - Death (nude female figure)",
+    "aic-8099": "Bresdin - The Comedy of Death (small nude figures)",
+    "aic-84510": "Dore - Massacre of the English (nudity + massacre imagery)",
+    "aic-97439": "Mucha - The Seasons (semi-nude figures)",
+    "aic-90808": "Redon - Primitive Man (nude crouching figure)"
+  }
+}

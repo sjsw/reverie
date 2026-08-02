@@ -1,0 +1,23 @@
+{
+  "name": "reverie",
+  "version": "1.0.0",
+  "description": "A self-hosted storytelling card game for 3-15 players, playable in the browser.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test \"test/**/*.test.js\"",
+    "fetch-cards": "node scripts/fetch-cards.mjs",
+    "restore-deck": "node scripts/restore-deck.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "license": "MIT",
+  "private": true
+}
