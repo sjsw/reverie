@@ -245,13 +245,10 @@ Some deliberate design choices:
 
 ## Licensing and naming
 
-The code here is MIT. The card images are public-domain works supplied under
-the open-access programmes of the Art Institute of Chicago and The Met;
-attribution travels with them in `manifest.json` and the in-app credits.
-
-Dixit is a trademark of Libellud. Reverie is an independent implementation of
-the game's public rules for private play, not affiliated with or endorsed by
-them.
+The source code is MIT (`LICENSE`). The card artwork and the relationship to
+Dixit are covered separately in [`NOTICE.md`](NOTICE.md) — in short: the images
+are public-domain museum works with attribution in `manifest.json`, and Dixit
+is a trademark of Libellud that this project is not affiliated with.
 
 Why the project is set up the way it is — four different rights are in play,
 and they carry very different weight:
