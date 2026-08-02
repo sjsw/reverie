@@ -1,9 +1,6 @@
 # Reverie
 
-### ▶ Play now at **[reverie.walter.com.au](https://reverie.walter.com.au)**
-
-No install, no account — start a game and share the four-letter room code.
-
+### Play at **[reverie.walter.com.au](https://reverie.walter.com.au)**
 ---
 
 An open-source clone of **[Dixit](https://www.libellud.com/dixit/)**, the
@@ -17,7 +14,7 @@ which was the original. Score by being understood by *some* — but not all.
 This is an independent implementation of the game's published rules with its
 own public-domain artwork. It is not affiliated with or endorsed by Libellud.
 If you enjoy it, [buy the real game](https://www.libellud.com/dixit/) — it is
-better, and it comes with Marie Cardouat's illustrations.
+better.
 
 - **Rules engine** — `src/rules.js`, pure and fully unit-tested
 - **Server** — Node + Express + `ws`, all state in memory
@@ -27,15 +24,9 @@ better, and it comes with Marie Cardouat's illustrations.
 ## Why this exists
 
 Reverie was built to replace **pixit.fun**, an earlier browser-based Dixit
-clone that is no longer online. It was the easiest way to get a group playing
-Dixit remotely, and there was nothing quite like it once it went away.
+clone that is no longer online.
 
-This is a substitute rather than a copy — none of pixit.fun's code or artwork
-is used here, and no connection to its authors is claimed or implied. If you
-landed here looking for pixit.fun, this is meant to fill the same gap. Thanks
-to whoever built it.
-
-The sections below are for running your own instance. To just play, use the
+The sections below are for running your own instance. To just play it, use the
 link at the top.
 
 ---
