@@ -19,7 +19,7 @@ better.
 - **Rules engine** — `src/rules.js`, pure and fully unit-tested
 - **Server** — Node + Express + `ws`, all state in memory
 - **Client** — dependency-free ES modules, no build step
-- **Deck** — 300 public-domain artworks fetched from museum open-access APIs
+- **Deck** — 219 public-domain artworks, hand-picked from named series
 
 ## Why this exists
 
@@ -35,7 +35,7 @@ link at the top.
 
 ```bash
 npm install
-npm run restore-deck    # downloads the 300 reviewed cards (~90 MB, one-off)
+npm run restore-deck    # downloads the 219 reviewed cards (~60 MB, one-off)
 npm start               # http://localhost:8080
 ```
 
@@ -56,12 +56,21 @@ WebSockets.
 ## The deck
 
 `npm run fetch-cards` pulls artwork from the
-[Art Institute of Chicago](https://api.artic.edu/docs/) and
-[The Met](https://metmuseum.github.io/) open-access APIs, keeping only images
-each institution has explicitly flagged as public domain. It targets artists
-whose work has the dreamlike, symbol-heavy quality the game needs —
-Hiroshige, Hokusai, Kuniyoshi, Yoshitoshi, Piranesi, Meryon, Bresdin, Redon,
-Doré, Corot and van Gogh among them.
+[Art Institute of Chicago](https://api.artic.edu/docs/) open-access API,
+keeping only images the museum has explicitly flagged as public domain.
+
+It searches for **named series**, not for artists, and then verifies the
+returned title actually matches. This matters more than it sounds: searching
+"Odilon Redon" returns his flower paintings alongside his dream lithographs,
+and searching an artist the museum does not hold returns fuzzy nonsense — a
+search for "Grandville" once came back with Manet. Searching
+*Carceri d'invenzione* and checking the title gives the surreal, invented
+imagery the game needs, with no false positives.
+
+The deck is Redon's noir portfolios, Piranesi's *Imaginary Prisons*, Goya's
+*Caprichos* and *Disparates*, Poe's *Raven*, Meryon's Paris, Bresdin's
+fantastical landscapes, and Japanese ghost prints — balanced with moonlight,
+weather and birds-and-flowers so it does not become relentlessly macabre.
 
 ```bash
 npm run fetch-cards -- --target 400    # bigger deck
@@ -75,14 +84,22 @@ on the in-app **See the deck** screen.
 
 The deck is built to be safe to put on a screen at work. Three layers:
 
-1. **Artist selection.** The query list is weighted to landscape, architecture,
-   nature and narrative illustration. Artists whose corpus is largely figure
-   study or erotica are left out entirely rather than filtered afterwards.
+1. **Series selection.** The query list targets named series weighted to
+   invented architecture, ghosts, dream lithographs and narrative illustration.
+   Artists whose corpus is largely figure study or erotica are left out entirely.
 2. **Title screening.** `UNSAFE_TITLE` in the fetch script drops anything whose
    title signals a nude or erotic subject. Deliberately broad.
-3. **Manual review.** All 300 cards in the shipped deck were inspected
-   individually. Rejects are listed with a reason in
-   `scripts/excluded-cards.json` and are never re-downloaded.
+3. **Manual review.** All 219 cards in the shipped deck were inspected
+   individually — the Goya plates at 3× magnification, since that is where
+   nudity concentrates (his witches' sabbath plates, 60–68). Rejects are listed
+   with a reason in `scripts/excluded-cards.json` and are never re-downloaded.
+
+Whole series were dropped rather than adjudicated plate by plate where the
+nudity is structural: Dürer's *Apocalypse* and the Dante/*Inferno* group are
+wall-to-wall nude damned souls. The *Temptation of Saint Anthony* splits
+cleanly — Redon's own lithographs are chimeras and disembodied eyes, while the
+classical Tiepolo and Cranach treatments are nude temptresses, so that query is
+restricted to Redon.
 
 > **If you re-run `npm run fetch-cards`, the result is no longer a reviewed
 > deck.** Museum search results drift, so a re-fetch can pull in images nobody
@@ -93,8 +110,8 @@ Layers 1 and 2 are automatic; layer 3 is the one that actually catches things,
 because plenty of works have incidental nudity with an innocuous title.
 
 The images are **not** committed, but the review is not lost either:
-`manifest.json` records the exact 300 works and their source URLs, so
-`npm run restore-deck` rebuilds the identical reviewed deck from a 128 KB file.
+`manifest.json` records the exact 219 works and their source URLs, so
+`npm run restore-deck` rebuilds the identical reviewed deck from a small file.
 
 The distinction matters:
 
@@ -133,7 +150,7 @@ fly apps create reverie-walter     # or pick your own name and edit fly.toml
 
 ```bash
 npm run restore-deck             # no-op if the deck is already present
-ls public/cards/*.jpg | wc -l    # expect 300 — the reviewed deck
+ls public/cards/*.jpg | wc -l    # expect 219 — the reviewed deck
 fly deploy --ha=false
 fly status                       # MUST show exactly one machine
 ```
