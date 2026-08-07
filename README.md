@@ -233,6 +233,39 @@ that record *should* be proxied.
 
 ---
 
+## Knowing whether anyone is playing
+
+`GET /healthz` reports both what is true right now and what has happened since
+the process booted:
+
+```json
+{
+  "ok": true,
+  "rooms": 0, "players": 0,
+  "roomsCreated": 12, "gamesStarted": 7, "gamesFinished": 4,
+  "peakRooms": 3, "peakPlayers": 11,
+  "since": "2026-08-07T22:29:09.104Z", "uptimeSeconds": 4210
+}
+```
+
+The first pair are **gauges** — they describe this instant. Sampling them on a
+schedule undercounts, because a game that starts and finishes between two
+samples is never seen. The rest are **counters**: they only go up, so any
+polling interval captures every game.
+
+Nothing is persisted. Reverie still has no database and nothing to back up, so
+the counters reset when the process restarts — which is what `since` is for. A
+reader that sees `since` change knows the counters restarted, rather than
+having to infer it from a number going backwards.
+
+The count is folded in on `Room#broadcast`, not in the action switch in
+`server.js`. A game reaches `FINISHED` by more routes than there are actions:
+the last vote scores the round automatically, and a disconnect can too.
+Counting per action would quietly miss those; every state change ends in a
+broadcast, so that is the one place that sees them all.
+
+---
+
 ## Configuration
 
 | Variable | Default | Meaning |
