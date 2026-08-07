@@ -21,6 +21,35 @@ export class RoomStore {
     this.rooms = new Map(); // code -> Room
     this.timer = setInterval(() => this.reap(), 60_000);
     this.timer.unref?.();
+
+    /**
+     * Cumulative counters, in memory, since this process booted.
+     *
+     * `rooms` and `players` are gauges: they describe this instant, so anything
+     * sampling them misses a game that starts and ends between two samples.
+     * These only ever go up, so any polling interval sees every game. They are
+     * deliberately not persisted — Reverie has no database and nothing to back
+     * up, and `since` below lets a reader spot the reset that a restart causes.
+     */
+    this.startedAt = Date.now();
+    this.totals = {
+      roomsCreated: 0,
+      gamesStarted: 0,
+      gamesFinished: 0,
+      peakRooms: 0,
+      peakPlayers: 0,
+    };
+  }
+
+  count(key) {
+    this.totals[key] += 1;
+  }
+
+  /** Track the high-water marks. Cheap, and called on every broadcast. */
+  noteConcurrency() {
+    const { rooms, players } = this.live;
+    if (rooms > this.totals.peakRooms) this.totals.peakRooms = rooms;
+    if (players > this.totals.peakPlayers) this.totals.peakPlayers = players;
   }
 
   newCode() {
@@ -36,8 +65,10 @@ export class RoomStore {
 
   create({ targetScore } = {}) {
     const code = this.newCode();
-    const room = new Room(code, this.cards, { targetScore });
+    const room = new Room(code, this.cards, { targetScore, store: this });
     this.rooms.set(code, room);
+    this.count('roomsCreated');
+    this.noteConcurrency();
     return room;
   }
 
@@ -56,18 +87,32 @@ export class RoomStore {
     }
   }
 
-  get stats() {
+  /** What is true right now. */
+  get live() {
     return {
       rooms: this.rooms.size,
       players: [...this.rooms.values()].reduce((n, r) => n + r.game.players.length, 0),
     };
   }
+
+  get stats() {
+    return {
+      ...this.live,
+      ...this.totals,
+      // A reader that sees `since` change knows the counters restarted, rather
+      // than having to infer it from a count going backwards.
+      since: new Date(this.startedAt).toISOString(),
+      uptimeSeconds: Math.floor((Date.now() - this.startedAt) / 1000),
+    };
+  }
 }
 
 export class Room {
-  constructor(code, cards, { targetScore } = {}) {
+  constructor(code, cards, { targetScore, store = null } = {}) {
     this.code = code;
+    this.store = store;
     this.game = R.createGame({ cards, targetScore });
+    this.lastPhase = this.game.phase;
     this.tokens = new Map(); // token -> playerId
     this.sockets = new Map(); // playerId -> ws
     this.droppedAt = new Map(); // playerId -> timestamp
@@ -220,8 +265,30 @@ export class Room {
     }
   }
 
+  /**
+   * Fold any phase change into the store's counters.
+   *
+   * Hooked to `broadcast` rather than to the individual actions in server.js,
+   * because a game reaches FINISHED by more routes than there are actions: the
+   * last vote scores the round automatically, and a player disconnecting can
+   * do the same. Counting per action would quietly miss those. Every state
+   * change ends in a broadcast, so this is the one place that sees them all.
+   */
+  syncStats() {
+    if (!this.store) return;
+
+    const phase = this.game.phase;
+    if (phase !== this.lastPhase) {
+      if (this.lastPhase === R.PHASES.LOBBY) this.store.count('gamesStarted');
+      if (phase === R.PHASES.FINISHED) this.store.count('gamesFinished');
+      this.lastPhase = phase;
+    }
+    this.store.noteConcurrency();
+  }
+
   /** Push fresh, individually-tailored state to every connected player. */
   broadcast() {
+    this.syncStats();
     for (const [playerId, ws] of this.sockets) {
       this.send(ws, { type: 'state', state: this.stateFor(playerId) });
     }
