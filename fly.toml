@@ -1,8 +1,11 @@
 # Fly.io deployment for Reverie.
 #
-# Rooms live in memory, so this app MUST run as exactly one always-on machine.
-# Two machines means two independent sets of rooms behind one hostname, and
-# players sharing a code land on different ones — the game silently breaks.
+# Rooms live in memory, so this app MUST run as exactly ONE machine. Two means
+# two independent sets of rooms behind one hostname, and players sharing a code
+# land on different ones — the game silently breaks.
+#
+# One machine, but not necessarily a running one: see the http_service notes
+# below on why parking it when idle is safe.
 #
 # `fly deploy` adds a second machine for high availability unless you stop it:
 #
@@ -25,10 +28,30 @@ primary_region = "iad"
 [http_service]
   internal_port = 8080
   force_https = true
-  # Never park the machine: suspending it would wipe every active room.
-  auto_stop_machines = false
+  # The machine may park when idle — but only via "suspend", never "stop".
+  #
+  # This looked impossible at first, and an earlier version of this comment
+  # asserted it was: rooms live in memory, so parking would surely wipe them.
+  # That conflated two different things. "stop" discards memory; "suspend"
+  # snapshots it and restores the *same process*. Verified against production
+  # by suspending the machine with a live room open: on wake, /healthz still
+  # reported the same `since`, the counters kept their values, and the room was
+  # still there — in half a second.
+  #
+  # It can only park once every player has disconnected, because Fly keeps a
+  # machine awake while connections are open and every player holds a
+  # WebSocket. Even a badly timed park is survivable: the client reconnects
+  # with backoff, and seats are held by localStorage token for two minutes.
+  # The room reaper compares timestamps rather than counting ticks, so rooms
+  # that expired mid-suspension are cleaned up correctly on waking.
+  #
+  # The caveat: only a short suspension has been tested. If Fly ever turns a
+  # long one into a full stop, memory goes. That is observable rather than
+  # silent — /healthz reports `since`, so it shows up as that timestamp
+  # changing without a deploy having happened.
+  auto_stop_machines = "suspend"
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
   processes = ["app"]
 
   [http_service.concurrency]

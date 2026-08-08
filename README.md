@@ -137,10 +137,18 @@ fly auth signup      # or: fly auth login
 
 ### 2. Create the app
 
-`fly.toml` is already configured for Ashburn, Virginia (`iad`) with a single
-always-on machine — rooms are held in memory, so the app must not auto-stop or
-scale to multiple instances. Change `primary_region` to move it; Fly's IPs are
-anycast, so no DNS or certificate work is needed.
+`fly.toml` is already configured for Ashburn, Virginia (`iad`) with a **single**
+machine — rooms are held in memory, so the app must never scale to multiple
+instances. Change `primary_region` to move it; Fly's IPs are anycast, so no DNS
+or certificate work is needed.
+
+That machine is allowed to **park when idle**, which is not obvious given
+in-memory rooms. `auto_stop_machines = "suspend"` snapshots memory and restores
+the same process; only `"stop"` would discard it. Fly keeps a machine awake
+while connections are open and every player holds a WebSocket, so it can only
+park once everyone has left. See the comments in `fly.toml`, and
+[Knowing whether anyone is playing](#knowing-whether-anyone-is-playing) for the
+`since` field that reveals it if a suspension ever becomes a stop.
 
 ```bash
 fly apps create reverie-walter     # or pick your own name and edit fly.toml
